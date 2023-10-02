@@ -31,7 +31,7 @@ services:
       - "traefik.http.routers.traefik.tls.certresolver=letsEncrypt"
       - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.services.traefik-traefik.loadbalancer.server.port=888"
-      - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:admin:$$apr1$$l0Nv4FsF$$WOxIj9OF7dcJxuol3Sv0X0"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:$$apr1$$l0Nv4FsF$$WOxIj9OF7dcJxuol3Sv0X0"
       - "traefik.http.routers.traefik.middlewares=traefik-auth"
 
   db:
