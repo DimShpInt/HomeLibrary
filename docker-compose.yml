@@ -26,7 +26,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=https"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.cool-family.keenetic.link`)"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.cool-family.keenetic.link`, `10.10.58.10`)"
       - "traefik.http.routers.traefik.tls=true"
       - "traefik.http.routers.traefik.tls.certresolver=letsEncrypt"
       - "traefik.http.routers.traefik.service=api@internal"
