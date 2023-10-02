@@ -1,4 +1,4 @@
-version: '3' 
+version: '3.5' 
 
 services:
 
@@ -43,14 +43,15 @@ services:
     volumes:
       - ./postgres:/var/lib/postgresql/data:rw
       - /etc/localtime:/etc/localtime:ro
-    environment:
-      - POSTGRES_DB_FILE=/run/secrets/postgres_db
-      - POSTGRES_USER_FILE=/run/secrets/postgres_user
-      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
-    secrets:
-      - postgres_db
-      - postgres_password
-      - postgres_user
+    env_file: .secret
+    # environment:
+    #   - POSTGRES_DB_FILE=/run/secrets/postgres_db
+    #   - POSTGRES_USER_FILE=/run/secrets/postgres_user
+    #   - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+    # secrets:
+    #   - postgres_db
+    #   - postgres_password
+    #   - postgres_user
     labels:
       - traefik.enable=false
 
@@ -69,25 +70,27 @@ services:
       - ./nextcloud/data:/var/www/html/data
       # - ./nextcloud/themes:/var/www/html/themes
       - /etc/localtime:/etc/localtime:ro
-    environment:
-      - POSTGRES_HOST=db
-      - POSTGRES_DB_FILE=/run/secrets/postgres_db
-      - POSTGRES_USER_FILE=/run/secrets/postgres_user
-      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
-      - NEXTCLOUD_ADMIN_PASSWORD_FILE=/run/secrets/nextcloud_admin_password
-      - NEXTCLOUD_ADMIN_USER_FILE=/run/secrets/nextcloud_admin_user
+    env_file: .secret
+
+    # environment:
+    #   - POSTGRES_HOST=db
+    #   - POSTGRES_DB_FILE=/run/secrets/postgres_db
+    #   - POSTGRES_USER_FILE=/run/secrets/postgres_user
+    #   - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+    #   - NEXTCLOUD_ADMIN_PASSWORD_FILE=/run/secrets/nextcloud_admin_password
+    #   - NEXTCLOUD_ADMIN_USER_FILE=/run/secrets/nextcloud_admin_user
       # - VIRTUAL_HOST=test.cakecloud.info
       # - LETSENCRYPT_HOST=test.cakecloud.info
       # - LETSENCRYPT_EMAIL=cakecloudinfo@gmail.com
     depends_on:
       - traefik
       - db
-    secrets:
-      - nextcloud_admin_password
-      - nextcloud_admin_user
-      - postgres_db
-      - postgres_password
-      - postgres_user
+    # secrets:
+    #   - nextcloud_admin_password
+    #   - nextcloud_admin_user
+    #   - postgres_db
+    #   - postgres_password
+    #   - postgres_user
     labels:
       - traefik.http.routers.nextcloud.rule=Host(`https://nextcloud.cool-family.keenetic.link`)
       - traefik.http.routers.nextcloud.tls=true
