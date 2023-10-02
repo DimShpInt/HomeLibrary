@@ -63,11 +63,11 @@ services:
     # ports:
     #   - 8080:80
     volumes:
-      - ./nextcloud:/var/www/html
+      # - ./nextcloud:/var/www/html
       - ./nextcloud/config:/var/www/html/config
-      - ./nextcloud/custom_apps:/var/www/html/custom_apps
+      # - ./nextcloud/custom_apps:/var/www/html/custom_apps
       - ./nextcloud/data:/var/www/html/data
-      - ./nextcloud/themes:/var/www/html/themes
+      # - ./nextcloud/themes:/var/www/html/themes
       - /etc/localtime:/etc/localtime:ro
     environment:
       - POSTGRES_HOST=db
@@ -105,10 +105,10 @@ services:
       - nextcloud
     restart: unless-stopped
     volumes:
-      - ./DocumentServer/data:/var/www/onlyoffice/Data
-      - ./proxy/certs/dhparam.pem:/var/www/onlyoffice/Data/certs/dhparam.pem
-      - ./proxy/certs/test.cakecloud.info/key.pem:/var/www/onlyoffice/Data/certs/onlyoffice.key
-      - ./proxy/certs/test.cakecloud.info/cert.pem:/var/www/onlyoffice/Data/certs/onlyoffice.crt
+      - ./onlyoffice/data:/var/www/onlyoffice/Data
+      # - ./proxy/certs/dhparam.pem:/var/www/onlyoffice/Data/certs/dhparam.pem
+      # - ./proxy/certs/test.cakecloud.info/key.pem:/var/www/onlyoffice/Data/certs/onlyoffice.key
+      # - ./proxy/certs/test.cakecloud.info/cert.pem:/var/www/onlyoffice/Data/certs/onlyoffice.crt
     environment:
       - JWT_ENABLED=true
       - JWT_SECRET=secret
