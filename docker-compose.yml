@@ -104,7 +104,7 @@ services:
     image: onlyoffice/documentserver:latest
     depends_on:
       - traefik
-      - db_onlyoffice
+      # - db_onlyoffice
       - nextcloud
     restart: unless-stopped
     volumes:
