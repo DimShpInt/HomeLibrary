@@ -131,13 +131,13 @@ services:
       - traefik
 #      - db_plex
     container_name: plex
-    network_mode: host
+    # network_mode: host
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Moscow
       - VERSION=docker
-      - PLEX_CLAIM=claim-yLUddPBeL3nwkUPxEnzX
+      - PLEX_CLAIM=${PLEX_CLAIM}
     volumes:
       - /home/library/movies/library:/config
       - /home/library/movies/shows:/tv
