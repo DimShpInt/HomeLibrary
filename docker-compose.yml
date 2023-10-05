@@ -34,7 +34,7 @@ services:
       - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:$$apr1$$l0Nv4FsF$$WOxIj9OF7dcJxuol3Sv0X0"
       - "traefik.http.routers.traefik.middlewares=traefik-auth"
 
-  db:
+  db_nextcloud:
     image: postgres:latest
     container_name: nextcloud-postgres
     networks:
@@ -84,7 +84,7 @@ services:
       # - LETSENCRYPT_EMAIL=cakecloudinfo@gmail.com
     depends_on:
       - traefik
-      - db
+      - db_nextcloud
     # secrets:
     #   - nextcloud_admin_password
     #   - nextcloud_admin_user
@@ -104,7 +104,7 @@ services:
     image: onlyoffice/documentserver:latest
     depends_on:
       - traefik
-      - db
+      - db_onlyoffice
       - nextcloud
     restart: unless-stopped
     volumes:
@@ -125,20 +125,23 @@ services:
       - traefik.port=443
 
   plex:
-    image: linuxserver/plex
+    image: lscr.io/linuxserver/plex:latest
+    restart: unless-stopped
     depends_on:
       - traefik
-      - db
-      - nextcloud
+#      - db_plex
     container_name: plex
-    restart: unless-stopped
+    network_mode: host
     environment:
-      - PUID=<your user ID>
-      - PGID=<your group ID>
+      - PUID=1000
+      - PGID=1000
       - TZ=Europe/Moscow
+      - VERSION=docker
+      - PLEX_CLAIM=claim-yLUddPBeL3nwkUPxEnzX
     volumes:
-      - /opt/plex:/config
-      - /mnt/disks/media:/data
+      - /home/library/movies/library:/config
+      - /home/library/movies/shows:/tv
+      - /home/library/movies/movies:/movies
     networks:
       - nextcloud_network
     labels:
@@ -146,7 +149,7 @@ services:
       - traefik.http.routers.plex.tls=true
       - traefik.http.routers.plex.tls.certresolver=lets-encrypt
       - traefik.port=443
-
+  
 networks:
   nextcloud_network:
     external: false
