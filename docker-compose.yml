@@ -71,7 +71,15 @@ services:
       # - ./nextcloud/themes:/var/www/html/themes
       - /etc/localtime:/etc/localtime:ro
     env_file: .secret
-
+    depends_on:
+      - traefik
+      - db_nextcloud
+    labels:
+      - "traefik.enable=true"
+      - traefik.http.routers.nextcloud.rule=Host(`https://nextcloud.cool-family.keenetic.link`)
+      - traefik.http.routers.nextcloud.tls=true
+      - traefik.http.routers.nextcloud.tls.certresolver=lets-encrypt
+      - traefik.port=443
     # environment:
     #   - POSTGRES_HOST=db
     #   - POSTGRES_DB_FILE=/run/secrets/postgres_db
@@ -82,20 +90,12 @@ services:
       # - VIRTUAL_HOST=test.cakecloud.info
       # - LETSENCRYPT_HOST=test.cakecloud.info
       # - LETSENCRYPT_EMAIL=cakecloudinfo@gmail.com
-    depends_on:
-      - traefik
-      - db_nextcloud
     # secrets:
     #   - nextcloud_admin_password
     #   - nextcloud_admin_user
     #   - postgres_db
     #   - postgres_password
     #   - postgres_user
-    labels:
-      - traefik.http.routers.nextcloud.rule=Host(`https://nextcloud.cool-family.keenetic.link`)
-      - traefik.http.routers.nextcloud.tls=true
-      - traefik.http.routers.nextcloud.tls.certresolver=lets-encrypt
-      - traefik.port=443
 
   onlyoffice:
     container_name: onlyoffice
@@ -137,7 +137,7 @@ services:
       - PGID=1000
       - TZ=Europe/Moscow
       - VERSION=docker
-      - PLEX_CLAIM=claim-HogsfHv6cr42Bj4vofxS
+      - PLEX_CLAIM=${my_claim}
     volumes:
       - /home/library/movies/library:/config
       - /home/library/movies/shows:/tv
