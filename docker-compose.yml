@@ -62,7 +62,7 @@ services:
       - nextcloud_network
     restart: unless-stopped
     ports:
-      - 443:443
+      - 443:80
     volumes:
       # - ./nextcloud:/var/www/html
       - ./nextcloud/config:/var/www/html/config
