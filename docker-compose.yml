@@ -131,24 +131,24 @@ services:
       - traefik
 #      - db_plex
     container_name: plex
-    # network_mode: host
+    network_mode: host
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Moscow
       - VERSION=docker
-      - PLEX_CLAIM=claim-2-3VEPQAHX4YZ54JAsDw
+      - PLEX_CLAIM=claim-HogsfHv6cr42Bj4vofxS
     volumes:
       - /home/library/movies/library:/config
       - /home/library/movies/shows:/tv
       - /home/library/movies/movies:/movies
-    networks:
-      - nextcloud_network
-    labels:
-      - traefik.http.routers.plex.rule=Host(`https://plex.cool-family.keenetic.link`)
-      - traefik.http.routers.plex.tls=true
-      - traefik.http.routers.plex.tls.certresolver=lets-encrypt
-      - traefik.port=443
+    # networks:
+      # - nextcloud_network
+    # labels:
+    #   - traefik.http.routers.plex.rule=Host(`https://plex.cool-family.keenetic.link`)
+    #   - traefik.http.routers.plex.tls=true
+    #   - traefik.http.routers.plex.tls.certresolver=lets-encrypt
+    #   - traefik.port=443
   
 networks:
   nextcloud_network:
