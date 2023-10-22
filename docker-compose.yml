@@ -61,8 +61,8 @@ services:
     networks:
       - nextcloud_network
     restart: unless-stopped
-    ports:
-      - 443:80
+    # ports:
+    #   - 443:80
     volumes:
       # - ./nextcloud:/var/www/html
       - ./nextcloud/config:/var/www/html/config
@@ -75,10 +75,12 @@ services:
       # - traefik
       - db_nextcloud
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.nextcloud.rule=Host(`10.10.58.10`)"
-      - "traefik.http.routers.nextcloud.entrypoints=https"
-      - "traefik.http.routers.nextcloudtls.certresolver=letsEncrypt"
+      - traefik.enable=true
+      - traefik.http.routers.nextcloud.rule=Host(`10.10.58.10`)
+      - traefik.http.routers.nextcloud.entrypoints=https
+      - traefik.http.routers.nextcloudtls.certresolver=letsEncrypt
+      - traefik.port=80
+
 
       # - traefik.enable=true
       # - traefik.http.routers.nextcloud.rule=Host(`https://nextcloud.cool-family.keenetic.link`, `10.10.58.10`)
