@@ -75,11 +75,16 @@ services:
       # - traefik
       - db_nextcloud
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.nextcloud.rule=Host(`https://nextcloud.cool-family.keenetic.link`, `10.10.58.10`)
-      - traefik.http.routers.nextcloud.tls=true
-      - traefik.http.routers.nextcloud.tls.certresolver=lets-encrypt
-      - traefik.port=80
+      - "traefik.enable=true"
+      - "traefik.http.routers.nextcloud.rule=Host(`cool-nextcloud.ru`)"
+      - "traefik.http.routers.nextcloud.entrypoints=https"
+      - "traefik.http.routers.nextcloudtls.certresolver=letsEncrypt"
+
+      # - traefik.enable=true
+      # - traefik.http.routers.nextcloud.rule=Host(`https://nextcloud.cool-family.keenetic.link`, `10.10.58.10`)
+      # - traefik.http.routers.nextcloud.tls=true
+      # - traefik.http.routers.nextcloud.tls.certresolver=lets-encrypt
+      # - traefik.port=80
     # environment:
     #   - POSTGRES_HOST=db
     #   - POSTGRES_DB_FILE=/run/secrets/postgres_db
