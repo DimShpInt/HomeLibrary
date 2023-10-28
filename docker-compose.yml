@@ -144,7 +144,7 @@ services:
       - PGID=1000
       - TZ=Europe/Moscow
       - VERSION=docker
-      - PLEX_CLAIM=${my_claim}
+      - PLEX_CLAIM=my_claim
     volumes:
       - /home/library/movies/library:/config
       - /home/library/movies/shows:/tv
