@@ -41,7 +41,7 @@ services:
       - nextcloud_network
     restart: unless-stopped
     volumes:
-      - ./postgres:/var/lib/postgresql/data:rw
+      - /home/library/HomeLibrary/postgres:/var/lib/postgresql/data:rw
       - /etc/localtime:/etc/localtime:ro
     env_file: .secret
     # environment:
@@ -65,9 +65,9 @@ services:
       - 8080:80
     volumes:
       # - ./nextcloud:/var/www/html
-      - ./nextcloud/config:/var/www/html/config
+      - /home/library/HomeLibrary/nextcloud/config:/var/www/html/config
       # - ./nextcloud/custom_apps:/var/www/html/custom_apps
-      - ./nextcloud/data:/var/www/html/data
+      - /home/library/HomeLibrary/nextcloud/data:/var/www/html/data
       # - ./nextcloud/themes:/var/www/html/themes
       - /etc/localtime:/etc/localtime:ro
     env_file: .secret
