@@ -64,16 +64,18 @@ services:
     ports:
       - 8080:80
     volumes:
-      # - ./nextcloud:/var/www/html
-      - /home/library/HomeLibrary/nextcloud/config:/var/www/html/config
+      - ./nextcloud:/var/www/html
+      - ./nextcloud/config:/var/www/html/config
       # - ./nextcloud/custom_apps:/var/www/html/custom_apps
-      - /home/library/HomeLibrary/nextcloud/data:/var/www/html/data
+      - ./nextcloud/data:/var/www/html/data
       # - ./nextcloud/themes:/var/www/html/themes
       - /etc/localtime:/etc/localtime:ro
     env_file: .secret
-    depends_on:
-      # - traefik
+    links:
       - db_nextcloud
+    depends_on:
+      - db_nextcloud
+      # - traefik
     # labels:
     #   - traefik.enable=true
     #   - traefik.http.routers.nextcloud.rule=Host(`10.10.58.10`)
