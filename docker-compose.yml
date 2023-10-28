@@ -44,11 +44,11 @@ services:
     volumes:
       - ./postgres:/var/lib/postgresql/data:rw
       - /etc/localtime:/etc/localtime:ro
-    env_file: .secret
-    # environment:
-    #   - POSTGRES_DB_FILE=/run/secrets/postgres_db
-    #   - POSTGRES_USER_FILE=/run/secrets/postgres_user
-    #   - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+    # env_file: .secret
+    environment:
+      - POSTGRES_DB=testdb
+      - POSTGRES_USER=testuser
+      - POSTGRES_PASSWORD=testpass
     # secrets:
     #   - postgres_db
     #   - postgres_password
@@ -72,8 +72,19 @@ services:
       # - ./nextcloud/themes:/var/www/html/themes
       - /etc/localtime:/etc/localtime:ro
     env_file: .secret
-    links:
-      - db_nextcloud
+    environment:
+      - POSTGRES_HOST=db_nextcloud
+      - POSTGRES_DB=testdb
+      - POSTGRES_USER=testuser
+      - POSTGRES_PASSWORD=testpass
+      - NEXTCLOUD_ADMIN_PASSWORD=admpass
+      - NEXTCLOUD_ADMIN_USER=admin
+      # - VIRTUAL_HOST=test.cakecloud.info
+      # - LETSENCRYPT_HOST=test.cakecloud.info
+      # - LETSENCRYPT_EMAIL=cakecloudinfo@gmail.com
+
+    # links:
+    #   - db_nextcloud
     depends_on:
       - db_nextcloud
       # - traefik
