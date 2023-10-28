@@ -63,7 +63,7 @@ services:
       - nextcloud_network
     restart: unless-stopped
     ports:
-      - 105880:80
+      - 15880:80
     volumes:
       - ./nextcloud:/var/www/html
       - ./nextcloud/config:/var/www/html/config
