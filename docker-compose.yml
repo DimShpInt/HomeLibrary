@@ -41,6 +41,8 @@ services:
     networks:
       - nextcloud_network
     restart: unless-stopped
+    ports:
+      - 5432:5432
     volumes:
       - ./postgres:/var/lib/postgresql/data:rw
       - /etc/localtime:/etc/localtime:ro
@@ -48,7 +50,7 @@ services:
     environment:
       - POSTGRES_DB=testdb
       - POSTGRES_USER=testuser
-      - POSTGRES_PASSWORD=testpass
+      - POSTGRES_PASSWORD=4X$xg&r2LJJiTw
     # secrets:
     #   - postgres_db
     #   - postgres_password
@@ -76,7 +78,7 @@ services:
       - POSTGRES_HOST=db_nextcloud
       - POSTGRES_DB=testdb
       - POSTGRES_USER=testuser
-      - POSTGRES_PASSWORD=testpass
+      - POSTGRES_PASSWORD=4X$xg&r2LJJiTw
       - NEXTCLOUD_ADMIN_PASSWORD=admpass
       - NEXTCLOUD_ADMIN_USER=admin
       # - VIRTUAL_HOST=test.cakecloud.info
