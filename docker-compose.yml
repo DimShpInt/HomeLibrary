@@ -37,9 +37,6 @@ services:
     volumes:
       - ./nextcloud:/var/www/html
     environment:
-      # - VIRTUAL_HOST=cloud.yourdomain.com
-      # - LETSENCRYPT_HOST=cloud.yourdomain.com
-      # - LETSENCRYPT_EMAIL=yourmail # <===== For let's encrypt
       - POSTGRES_HOST=nextcloud_db
       - REDIS_HOST=redis
     env_file:
