@@ -17,43 +17,57 @@ services:
       - /home/library/movies/shows:/tv
       - /home/library/movies/movies:/movies
 
-  nextcloud_db:
-    image: postgres:alpine
+  db:
+    image: postgres
     restart: always
     volumes:
-      - ./postgres:/var/lib/postgresql/data
-    env_file:
-      - secret.env
+      - ./db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB_FILE=/run/secrets/postgres_db
+      - POSTGRES_USER_FILE=/run/secrets/postgres_user
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+    secrets:
+      - postgres_db
+      - postgres_password
+      - postgres_user
 
-  redis:
-    image: redis:alpine
-    restart: always
-
-  nextcloud_web:
-    image: nextcloud:apache
+  app:
+    image: nextcloud
     restart: always
     ports:
       - 15880:80
     volumes:
-      - ./nextcloud:/var/www/html
+      - nextcloud:/var/www/html
     environment:
-      - POSTGRES_HOST=nextcloud_db
-      - REDIS_HOST=redis
-    env_file:
-      - secret.env
+      - POSTGRES_HOST=db
+      - POSTGRES_DB_FILE=/run/secrets/postgres_db
+      - POSTGRES_USER_FILE=/run/secrets/postgres_user
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+      - NEXTCLOUD_ADMIN_PASSWORD_FILE=/run/secrets/nextcloud_admin_password
+      - NEXTCLOUD_ADMIN_USER_FILE=/run/secrets/nextcloud_admin_user
     depends_on:
-      - nextcloud_db
-      - redis
+      - db
+    secrets:
+      - nextcloud_admin_password
+      - nextcloud_admin_user
+      - postgres_db
+      - postgres_password
+      - postgres_user
+ 
+volumes:
+  nextcloud:
 
-  cron:
-    image: nextcloud:apache
-    restart: always
-    volumes:
-      - ./nextcloud:/var/www/html
-    entrypoint: /cron.sh
-    depends_on:
-      - nextcloud_db
-      - redis
+secrets:
+  postgres_db:
+    file: ./secrets/postgres_db.txt
+  postgres_user:
+    file: ./secrets/postgres_user.txt
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+  nextcloud_admin_password:
+    file: ./secrets/nextcloud_admin_password.txt
+  nextcloud_admin_user:
+    file: ./secrets/nextcloud_admin_user.txt
 
 networks:
     external:
