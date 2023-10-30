@@ -50,7 +50,7 @@ services:
     environment:
       - POSTGRES_DB=testdb
       - POSTGRES_USER=testuser
-      - POSTGRES_PASSWORD='4X$xg&r2LJJiTw'
+      - POSTGRES_PASSWORD=4Xxg&r2LJJiTwRRrr
     # secrets:
     #   - postgres_db
     #   - postgres_password
@@ -78,7 +78,7 @@ services:
       - POSTGRES_HOST=db_nextcloud
       - POSTGRES_DB=testdb
       - POSTGRES_USER=testuser
-      - POSTGRES_PASSWORD='4X$xg&r2LJJiTw'
+      - POSTGRES_PASSWORD=4Xxg&r2LJJiTwRRrr
       - NEXTCLOUD_ADMIN_PASSWORD=admpass
       - NEXTCLOUD_ADMIN_USER=admin
       # - VIRTUAL_HOST=test.cakecloud.info
