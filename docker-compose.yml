@@ -32,6 +32,8 @@ services:
   nextcloud_web:
     image: nextcloud:apache
     restart: always
+    ports:
+      - 15880:80
     volumes:
       - ./nextcloud:/var/www/html
     environment:
