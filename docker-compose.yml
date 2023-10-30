@@ -56,6 +56,11 @@ services:
       - nextcloud_db
       - redis
 
+networks:
+  default:
+    external:
+      name: keenetic-net
+
 # volumes:
 #   nextcloud_dbdata:
 #   nextcloud:
