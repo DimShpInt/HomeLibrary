@@ -1,56 +1,82 @@
-version: '3.8' 
+version: "3.9"
 
 services:
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    restart: unless-stopped
+    container_name: plex
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Moscow
+      - VERSION=docker
+      - PLEX_CLAIM=my_claim
+    volumes:
+      - /home/library/movies/library:/config
+      - /home/library/movies/shows:/tv
+      - /home/library/movies/movies:/movies
 
-  # traefik:
-  #   image: traefik:v2.10
-  #   container_name: traefik
-  #   restart: unless-stopped
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   ports:
-  #     - 80:80
-  #     - 443:443
-  #   # environment:
-  #   #   - CF_API_EMAIL=<cloudflare email>
-  #   #   - CF_API_KEY=<cloudflare api key>
-  #   volumes:
-  #     - /etc/localtime:/etc/localtime:ro
-  #     - /var/run/docker.sock:/var/run/docker.sock:ro
-  #     - ./traefik/traefik.yml:/traefik.yml:ro
-  #     - ./traefik/acme.json:/acme.json
-  #     # - /opt/traefik/letsencrypt:/letsencrypt
+  nextcloud_db:
+    image: postgres:alpine
+    restart: always
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    env_file:
+      - secret.env
+
+  redis:
+    image: redis:alpine
+    restart: always
+
+  nextcloud_web:
+    image: nextcloud:apache
+    restart: always
+    volumes:
+      - ./nextcloud:/var/www/html
+    environment:
+      # - VIRTUAL_HOST=cloud.yourdomain.com
+      # - LETSENCRYPT_HOST=cloud.yourdomain.com
+      # - LETSENCRYPT_EMAIL=yourmail # <===== For let's encrypt
+      - POSTGRES_HOST=nextcloud_db
+      - REDIS_HOST=redis
+    env_file:
+      - secret.env
+    depends_on:
+      - nextcloud_db
+      - redis
+
+  cron:
+    image: nextcloud:apache
+    restart: always
+    volumes:
+      - ./nextcloud:/var/www/html
+    entrypoint: /cron.sh
+    depends_on:
+      - nextcloud_db
+      - redis
+
+# volumes:
+#   nextcloud_dbdata:
+#   nextcloud:
+
+  # db_nextcloud:
+  #   image: postgres:latest
+  #   hostname: db_nextcloud
+  #   container_name: nextcloud-postgres
   #   networks:
   #     - nextcloud_network
-  #     - traefik_network
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.traefik.entrypoints=https"
-  #     - "traefik.http.routers.traefik.rule=Host(`traefik.myhost.local`)"
-  #     - "traefik.http.routers.traefik.tls=true"
-  #     - "traefik.http.routers.traefik.tls.certresolver=letsEncrypt"
-  #     - "traefik.http.routers.traefik.service=api@internal"
-  #     - "traefik.http.services.traefik-traefik.loadbalancer.server.port=888"
-  #     - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:$$apr1$$l0Nv4FsF$$WOxIj9OF7dcJxuol3Sv0X0"
-  #     - "traefik.http.routers.traefik.middlewares=traefik-auth"
-
-  db_nextcloud:
-    image: postgres:latest
-    hostname: db_nextcloud
-    container_name: nextcloud-postgres
-    networks:
-      - nextcloud_network
-    restart: unless-stopped
-    ports:
-      - 5432:5432
-    volumes:
-      - ./postgres:/var/lib/postgresql/data:rw
-      - /etc/localtime:/etc/localtime:ro
-    # env_file: .secret
-    environment:
-      - POSTGRES_DB=testdb
-      - POSTGRES_USER=testuser
-      - POSTGRES_PASSWORD=4Xxg&r2LJJiTwRRrr
+  #   restart: unless-stopped
+  #   ports:
+  #     - 5432:5432
+  #   volumes:
+  #     - ./postgres:/var/lib/postgresql/data:rw
+  #     - /etc/localtime:/etc/localtime:ro
+  #   # env_file: .secret
+  #   environment:
+  #     - POSTGRES_DB=testdb
+  #     - POSTGRES_USER=testuser
+  #     - POSTGRES_PASSWORD=4Xxg&r2LJJiTwRRrr
     # secrets:
     #   - postgres_db
     #   - postgres_password
@@ -58,37 +84,37 @@ services:
     # labels:
     #   - traefik.enable=false
 
-  nextcloud:
-    image: nextcloud:latest
-    container_name: nextcloud
-    networks:
-      - nextcloud_network
-    restart: unless-stopped
-    ports:
-      - 15880:80
-    volumes:
-      - ./nextcloud:/var/www/html
-      - ./nextcloud/config:/var/www/html/config
-      # - ./nextcloud/custom_apps:/var/www/html/custom_apps
-      - ./nextcloud/data:/var/www/html/data
-      # - ./nextcloud/themes:/var/www/html/themes
-      - /etc/localtime:/etc/localtime:ro
-    # env_file: .secret
-    environment:
-      - POSTGRES_HOST=db_nextcloud
-      - POSTGRES_DB=testdb
-      - POSTGRES_USER=testuser
-      - POSTGRES_PASSWORD=4Xxg&r2LJJiTwRRrr
-      - NEXTCLOUD_ADMIN_PASSWORD=admpass
-      - NEXTCLOUD_ADMIN_USER=admin
-      # - VIRTUAL_HOST=test.cakecloud.info
-      # - LETSENCRYPT_HOST=test.cakecloud.info
-      # - LETSENCRYPT_EMAIL=cakecloudinfo@gmail.com
+  # nextcloud:
+  #   image: nextcloud:latest
+  #   container_name: nextcloud
+  #   networks:
+  #     - nextcloud_network
+  #   restart: unless-stopped
+  #   ports:
+  #     - 15880:80
+  #   volumes:
+  #     - ./nextcloud:/var/www/html
+  #     - ./nextcloud/config:/var/www/html/config
+  #     # - ./nextcloud/custom_apps:/var/www/html/custom_apps
+  #     - ./nextcloud/data:/var/www/html/data
+  #     # - ./nextcloud/themes:/var/www/html/themes
+  #     - /etc/localtime:/etc/localtime:ro
+  #   # env_file: .secret
+  #   environment:
+  #     - POSTGRES_HOST=db_nextcloud
+  #     - POSTGRES_DB=testdb
+  #     - POSTGRES_USER=testuser
+  #     - POSTGRES_PASSWORD=4Xxg&r2LJJiTwRRrr
+  #     - NEXTCLOUD_ADMIN_PASSWORD=admpass
+  #     - NEXTCLOUD_ADMIN_USER=admin
+  #     # - VIRTUAL_HOST=test.cakecloud.info
+  #     # - LETSENCRYPT_HOST=test.cakecloud.info
+  #     # - LETSENCRYPT_EMAIL=cakecloudinfo@gmail.com
 
-    # links:
-    #   - db_nextcloud
-    depends_on:
-      - db_nextcloud
+  #   # links:
+  #   #   - db_nextcloud
+  #   depends_on:
+  #     - db_nextcloud
       # - traefik
     # labels:
     #   - traefik.enable=true
@@ -120,51 +146,51 @@ services:
     #   - postgres_password
     #   - postgres_user
 
-  onlyoffice:
-    container_name: onlyoffice
-    networks:
-      - nextcloud_network
-    image: onlyoffice/documentserver:latest
-    depends_on:
-      # - traefik
-      # - db_onlyoffice
-      - nextcloud
-    restart: unless-stopped
-    volumes:
-      - ./onlyoffice/data:/var/www/onlyoffice/Data
-      # - ./proxy/certs/dhparam.pem:/var/www/onlyoffice/Data/certs/dhparam.pem
-      # - ./proxy/certs/test.cakecloud.info/key.pem:/var/www/onlyoffice/Data/certs/onlyoffice.key
-      # - ./proxy/certs/test.cakecloud.info/cert.pem:/var/www/onlyoffice/Data/certs/onlyoffice.crt
-    environment:
-      - JWT_ENABLED=true
-      - JWT_SECRET=secret
-    ports:
-      - 8888:80
-      - 4443:443
+  # onlyoffice:
+  #   container_name: onlyoffice
+  #   networks:
+  #     - nextcloud_network
+  #   image: onlyoffice/documentserver:latest
+  #   depends_on:
+  #     # - traefik
+  #     # - db_onlyoffice
+  #     - nextcloud
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./onlyoffice/data:/var/www/onlyoffice/Data
+  #     # - ./proxy/certs/dhparam.pem:/var/www/onlyoffice/Data/certs/dhparam.pem
+  #     # - ./proxy/certs/test.cakecloud.info/key.pem:/var/www/onlyoffice/Data/certs/onlyoffice.key
+  #     # - ./proxy/certs/test.cakecloud.info/cert.pem:/var/www/onlyoffice/Data/certs/onlyoffice.crt
+  #   environment:
+  #     - JWT_ENABLED=true
+  #     - JWT_SECRET=secret
+  #   ports:
+  #     - 8888:80
+  #     - 4443:443
     # labels:
     #   - traefik.http.routers.onlyoffice.rule=Host(`https://onlyoffice.cool-family.keenetic.link`)
     #   - traefik.http.routers.onlyoffice.tls=true
     #   - traefik.http.routers.onlyoffice.tls.certresolver=lets-encrypt
     #   - traefik.port=443
 
-  plex:
-    image: lscr.io/linuxserver/plex:latest
-    restart: unless-stopped
-    # depends_on:
-      # - traefik
-#      - db_plex
-    container_name: plex
-    network_mode: host
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Moscow
-      - VERSION=docker
-      - PLEX_CLAIM=my_claim
-    volumes:
-      - /home/library/movies/library:/config
-      - /home/library/movies/shows:/tv
-      - /home/library/movies/movies:/movies
+#   plex:
+#     image: lscr.io/linuxserver/plex:latest
+#     restart: unless-stopped
+#     # depends_on:
+#       # - traefik
+# #      - db_plex
+#     container_name: plex
+#     network_mode: host
+#     environment:
+#       - PUID=1000
+#       - PGID=1000
+#       - TZ=Europe/Moscow
+#       - VERSION=docker
+#       - PLEX_CLAIM=my_claim
+#     volumes:
+#       - /home/library/movies/library:/config
+#       - /home/library/movies/shows:/tv
+#       - /home/library/movies/movies:/movies
     # networks:
       # - nextcloud_network
     # labels:
@@ -173,8 +199,8 @@ services:
     #   - traefik.http.routers.plex.tls.certresolver=lets-encrypt
     #   - traefik.port=443
   
-networks:
-  nextcloud_network:
-    external: false
+# networks:
+#   nextcloud_network:
+#     external: false
   # traefik_network:
   #   external: true
