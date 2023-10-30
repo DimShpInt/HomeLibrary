@@ -56,7 +56,6 @@ services:
       - redis
 
 networks:
-  default:
     external:
       name: keenetic-net
 
