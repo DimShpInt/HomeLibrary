@@ -71,7 +71,7 @@ services:
       - ./nextcloud/data:/var/www/html/data
       # - ./nextcloud/themes:/var/www/html/themes
       - /etc/localtime:/etc/localtime:ro
-    env_file: .secret
+    # env_file: .secret
     environment:
       - POSTGRES_HOST=db_nextcloud
       - POSTGRES_DB=testdb
