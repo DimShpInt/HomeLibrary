@@ -38,14 +38,14 @@ services:
       - 15880:80
     volumes:
       - nextcloud:/var/www/html
+      - /home/library/HomeLibrary/nextcloud/config:/var/www/html/config
     environment:
       - POSTGRES_HOST=db
       - POSTGRES_DB_FILE=/run/secrets/postgres_db
       - POSTGRES_USER_FILE=/run/secrets/postgres_user
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
       - NEXTCLOUD_ADMIN_PASSWORD_FILE=/run/secrets/nextcloud_admin_password
-      - NEXTCLOUD_ADMIN_USER_FILE=/run/secrets/nextcloud_admin_user
-      - NEXTCLOUD_TRUSTED_DOMAINS='https://nextcloud.cool-family.keenetic.link','http://nextcloud.cool-family.keenetic.link','10.10.58.10'
+      - NEXTCLOUD_ADMIN_USER_FILE=/run/secrets/nextcloud_admin_user      
     depends_on:
       - db
     secrets:
