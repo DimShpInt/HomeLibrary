@@ -63,6 +63,7 @@ services:
       - 15443:443
     volumes:
       - nextcloud:/var/www/html
+      - /home/library/photo_library:/var/www/html/data
       - /home/library/HomeLibrary/nextcloud/config:/var/www/html/config
     environment:
       - POSTGRES_HOST=db
