@@ -66,6 +66,7 @@ services:
       - /home/library/photo_library:/var/www/html/data
       - /home/library/HomeLibrary/nextcloud/config:/var/www/html/config
     environment:
+      - SERVER_NAME=localhost
       - POSTGRES_HOST=db
       - POSTGRES_DB_FILE=/run/secrets/postgres_db
       - POSTGRES_USER_FILE=/run/secrets/postgres_user
