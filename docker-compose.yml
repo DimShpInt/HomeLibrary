@@ -1,4 +1,4 @@
-version: "3.9"
+#version: "3.9"
 
 services:
   plex:
@@ -6,16 +6,43 @@ services:
     restart: unless-stopped
     container_name: plex
     network_mode: host
+#    ports:
+     # - 32400:32400/tcp
+     # - 3005:3005/tcp
+     # - 8324:8324/tcp
+     # - 32469:32469/tcp
+     # - 1900:1900/udp
+     # - 32410:32410/udp
+     # - 32412:32412/udp
+     # - 32413:32413/udp
+     # - 32414:32414/udp
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Moscow
       - VERSION=docker
-      - PLEX_CLAIM=my_claim
+      - PLEX_CLAIM=claim-MReAGi92dYEhcxirx6Vn
     volumes:
-      - /home/library/movies/library:/config
-      - /home/library/movies/shows:/tv
-      - /home/library/movies/movies:/movies
+      - /home/library/media/library:/config
+      - /home/library/media/shows:/tv
+      - /home/library/media/movies:/movies
+
+  torrserver:
+    image: ghcr.io/yourok/torrserver
+    container_name: torrserver
+    network_mode: host    # to allow DLNA feature
+    environment:
+      - TS_PORT=8090
+      - TS_DONTKILL=1
+      - TS_HTTPAUTH=0
+      - TS_CONF_PATH=/opt/ts/config
+      - TS_TORR_DIR=/opt/ts/torrents
+    volumes:
+      - /home/library/torrserver/torrents:/opt/ts/torrents
+      - /home/library/torrserver/config:/opt/ts/config
+    ports:
+      - 8090:8090
+    restart: unless-stopped
 
   transmission:
     image: lscr.io/linuxserver/transmission:latest
@@ -32,8 +59,9 @@ services:
       # - HOST_WHITELIST= #optional
     volumes:
       - ./transmission/config:/config
-      - /home/library/movies/movies:/movies
-      - /home/library/movies/shows:/shows
+      - /home/library/media/movies:/movies
+      - /home/library/media/shows:/shows
+      - /home/library/media/torrent:/torrent
       # - /home/library/movies/watch:/watch
     ports:
       - 9091:9091
@@ -67,6 +95,7 @@ services:
       - /home/library/photo_library:/var/www/html/data
       - /home/library/HomeLibrary/nextcloud/config:/var/www/html/config
     environment:
+ #     - NEXTCLOUD_HOSTNAME=localhost
       - POSTGRES_HOST=db
       - POSTGRES_DB_FILE=/run/secrets/postgres_db
       - POSTGRES_USER_FILE=/run/secrets/postgres_user
