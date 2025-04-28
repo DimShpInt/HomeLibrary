@@ -4,8 +4,7 @@ services:
   # Медиасервер для просмотра
   photoprism:
     image: photoprism/photoprism:latest
-    # restart: unless-stopped
-    stop_grace_period: 10s
+    restart: unless-stopped
     container_name: photoprism
     depends_on:
       - mariadb
@@ -15,82 +14,90 @@ services:
     ports:
       - "2342:2342"
     environment:
-      PHOTOPRISM_ADMIN_PASSWORD: "insecure"          # initial admin password (8-72 characters)
+      PHOTOPRISM_ADMIN_PASSWORD: ${PHOTOPRISM_ADMIN_PASSWORD}          # initial admin password (8-72 characters)
       PHOTOPRISM_SITE_URL: "http://localhost:2342/"  # server URL in the format "http(s)://domain.name(:port)/(path)"
       PHOTOPRISM_DISABLE_TENSORFLOW: "true"          # disables all features depending on TensorFlow
       PHOTOPRISM_DATABASE_DRIVER: "mysql"            # MariaDB 10.5.12+ (MySQL successor) offers significantly better performance compared to SQLite
       PHOTOPRISM_DATABASE_SERVER: "mariadb:3306"     # MariaDB database server (hostname:port)
       PHOTOPRISM_DATABASE_NAME: "photoprism"         # MariaDB database, see MARIADB_DATABASE in the mariadb service
       PHOTOPRISM_DATABASE_USER: "photoprism"         # MariaDB database username, must be the same as MARIADB_USER
-      PHOTOPRISM_DATABASE_PASSWORD: "insecure"       # MariaDB database password, must be the same as MARIADB_PASSWORD
+      PHOTOPRISM_DATABASE_PASSWORD: ${MARIADB_PASSWORD}       # MariaDB database password, must be the same as MARIADB_PASSWORD
       PHOTOPRISM_FFMPEG_ENCODER: "software"          # H.264/AVC encoder (software, intel, nvidia, apple, raspberry, or vaapi)
       PHOTOPRISM_FFMPEG_BITRATE: "18"              # video bitrate limit in Mbps (default: 60)
       # Оптимизация CPU (i5-9400F)
       FFMPEG_THREADS: "6"                  # по числу ядер i5-9400F
       OMP_NUM_THREADS: "4"                 # для параллельной обработки
     working_dir: "/photoprism" # do not change or remove
-    ## Storage Folders: "~" is a shortcut for your home directory, "." for the current directory
     volumes:
       - "/storage/originals:/photoprism/originals"               # Original media files (DO NOT REMOVE)
       - "/storage/import:/photoprism/import"                  # *Optional* base folder from which files can be imported to originals
-      - "/home/librarian/library/media_server/photoprism/storage:/photoprism/storage"                  # *Writable* storage folder for cache, database, and sidecar files (DO NOT REMOVE)
-
-  ## MariaDB Database Server (recommended)
-  ## see https://docs.photoprism.app/getting-started/faq/#should-i-use-sqlite-mariadb-or-mysql
+      - "/storage/storage/sidecar:/photoprism/storage/sidecar"    # HDD
+      - "/storage/storage/config:/photoprism/storage/config"      # HDD
+      - "/home/librarian/library/media_server/photoprism/storage/cache:/photoprism/storage/cache"                  # *Writable* storage folder for cache, database, and sidecar files (DO NOT REMOVE)
+      
   mariadb:
     image: mariadb:11
-    ## If MariaDB gets stuck in a restart loop, this points to a memory or filesystem issue:
-    ## https://docs.photoprism.app/getting-started/troubleshooting/#fatal-server-errors
     restart: unless-stopped
-    stop_grace_period: 5s
-    security_opt: # see https://github.com/MariaDB/mariadb-docker/issues/434#issuecomment-1136151239
+    security_opt: 
       - seccomp:unconfined
       - apparmor:unconfined
-    command: --innodb-buffer-pool-size=512M --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=512 --innodb-rollback-on-timeout=OFF --innodb-lock-wait-timeout=120
-    ## Never store database files on an unreliable device such as a USB flash drive, an SD card, or a shared network folder:
+    command: 
+      --innodb-buffer-pool-size=12G 
+      --innodb-buffer-pool-instances=6
+      --innodb-log-file-size=2G
+      --innodb-flush-method=O_DIRECT 
+      --innodb-io-capacity=2000 
+      --innodb-io-capacity-max=4000
+      --innodb-read-io-threads=6
+      --innodb-write-io-threads=3
+      --transaction-isolation=READ-COMMITTED 
+      --character-set-server=utf8mb4 
+      --collation-server=utf8mb4_unicode_ci 
+      --max-connections=512 
+      --innodb-rollback-on-timeout=OFF 
+      --innodb-lock-wait-timeout=120
     volumes:
-      - "./database:/var/lib/mysql" # DO NOT REMOVE
+      - "/home/librarian/library/media_server/mariadb:/var/lib/mysql" # DO NOT REMOVE
+      - "/storage/mariadb_dumps:/backups" 
     environment:
-      MARIADB_AUTO_UPGRADE: "1"
       MARIADB_INITDB_SKIP_TZINFO: "1"
+      MARIADB_INNODB_USE_NATIVE_AIO: "1"
+      MARIADB_PERFORMANCE_SCHEMA: "ON"
+      MARIADB_DEFAULT_TIME_ZONE: "+03:00"
       MARIADB_DATABASE: "photoprism"
       MARIADB_USER: "photoprism"
-      MARIADB_PASSWORD: "insecure"
-      MARIADB_ROOT_PASSWORD: "insecure"
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD} 
 
-  # Веб-интерфейс для загрузки с мобильных
-  filebrowser:
-    image: filebrowser/filebrowser:latest
-    container_name: filebrowser
-    volumes:
-      - /path/to/zfs/storage:/srv  # Тот же путь ZFS
-      - /path/to/filebrowser.db:/database/filebrowser.db
-    environment:
-      FB_AUTH_SERVER_ADDR: "0.0.0.0:8080"
-    ports:
-      - "8080:8080"
-    restart: unless-stopped
+  # # Веб-интерфейс для загрузки с мобильных
+  # filebrowser:
+  #   image: filebrowser/filebrowser:latest
+  #   container_name: filebrowser
+  #   volumes:
+  #     - /path/to/zfs/storage:/srv  # Тот же путь ZFS
+  #     - /path/to/filebrowser.db:/database/filebrowser.db
+  #   environment:
+  #     FB_AUTH_SERVER_ADDR: "0.0.0.0:8080"
+  #   ports:
+  #     - "8080:8080"
+  #   restart: unless-stopped
 
-  # Обратный прокси с аутентификацией
-  traefik:
-    image: traefik:v2.5
-    container_name: traefik
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./letsencrypt:/letsencrypt
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    restart: unless-stopped
-
-volumes:
-  photoprism_storage:
-  db_data:
+  # # Обратный прокси с аутентификацией
+  # traefik:
+  #   image: traefik:v2.5
+  #   container_name: traefik
+  #   command:
+  #     - "--api.insecure=true"
+  #     - "--providers.docker=true"
+  #     - "--entrypoints.web.address=:80"
+  #     - "--entrypoints.websecure.address=:443"
+  #     - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+  #     - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}"
+  #     - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./letsencrypt:/letsencrypt
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #   restart: unless-stopped
