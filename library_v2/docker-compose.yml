@@ -14,6 +14,9 @@ services:
     ports:
       - "2342:2342"
     environment:
+      PHOTOPRISM_ADMIN_USER: "librarian" 
+      PHOTOPRISM_READONLY: "false"
+      PHOTOPRISM_AUTH_MODE: "password"
       PHOTOPRISM_ADMIN_PASSWORD: ${PHOTOPRISM_ADMIN_PASSWORD}          # initial admin password (8-72 characters)
       PHOTOPRISM_SITE_URL: "http://localhost:2342/"  # server URL in the format "http(s)://domain.name(:port)/(path)"
       PHOTOPRISM_DISABLE_TENSORFLOW: "true"          # disables all features depending on TensorFlow
