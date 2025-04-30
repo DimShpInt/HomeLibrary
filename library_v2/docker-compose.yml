@@ -14,12 +14,15 @@ services:
     ports:
       - "2342:2342"
     environment:
-      PHOTOPRISM_ADMIN_USER: "librarian" 
       PHOTOPRISM_READONLY: "false"
+      PHOTOPRISM_EXPERIMENTAL: "true"  
+      PHOTOPRISM_DISABLE_TENSORFLOW: "true"          # disables all features depending on TensorFlow
+      PHOTOPRISM_DISABLE_FACES: "true"               # disables face detection and recognition (requires TensorFlow)
+      PHOTOPRISM_DISABLE_CLASSIFICATION: "true"     # disables image classification (requires TensorFlow)
+      PHOTOPRISM_ADMIN_USER: "librarian"            
       PHOTOPRISM_AUTH_MODE: "password"
       PHOTOPRISM_ADMIN_PASSWORD: ${PHOTOPRISM_ADMIN_PASSWORD}          # initial admin password (8-72 characters)
       PHOTOPRISM_SITE_URL: "http://localhost:2342/"  # server URL in the format "http(s)://domain.name(:port)/(path)"
-      PHOTOPRISM_DISABLE_TENSORFLOW: "true"          # disables all features depending on TensorFlow
       PHOTOPRISM_DATABASE_DRIVER: "mysql"            # MariaDB 10.5.12+ (MySQL successor) offers significantly better performance compared to SQLite
       PHOTOPRISM_DATABASE_SERVER: "mariadb:3306"     # MariaDB database server (hostname:port)
       PHOTOPRISM_DATABASE_NAME: "photoprism"         # MariaDB database, see MARIADB_DATABASE in the mariadb service
