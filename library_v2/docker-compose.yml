@@ -74,36 +74,3 @@ services:
       MARIADB_USER: "photoprism"
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD} 
-
-  # # Веб-интерфейс для загрузки с мобильных
-  # filebrowser:
-  #   image: filebrowser/filebrowser:latest
-  #   container_name: filebrowser
-  #   volumes:
-  #     - /path/to/zfs/storage:/srv  # Тот же путь ZFS
-  #     - /path/to/filebrowser.db:/database/filebrowser.db
-  #   environment:
-  #     FB_AUTH_SERVER_ADDR: "0.0.0.0:8080"
-  #   ports:
-  #     - "8080:8080"
-  #   restart: unless-stopped
-
-  # # Обратный прокси с аутентификацией
-  # traefik:
-  #   image: traefik:v2.5
-  #   container_name: traefik
-  #   command:
-  #     - "--api.insecure=true"
-  #     - "--providers.docker=true"
-  #     - "--entrypoints.web.address=:80"
-  #     - "--entrypoints.websecure.address=:443"
-  #     - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-  #     - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}"
-  #     - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   volumes:
-  #     - ./letsencrypt:/letsencrypt
-  #     - /var/run/docker.sock:/var/run/docker.sock:ro
-  #   restart: unless-stopped
