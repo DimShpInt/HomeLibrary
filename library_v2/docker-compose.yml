@@ -91,3 +91,20 @@ services:
       - TS_TORR_DIR=/opt/torrserver/torrents
       - TS_PATH=/opt/torrserver/config
       - TS_LOGPATHDIR=/opt/torrserver/log
+
+# Plex
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    restart: unless-stopped
+    container_name: plex
+    network_mode: host
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=Europe/Moscow
+      - VERSION=docker
+      - PLEX_CLAIM=$PLEX_CLAIM
+    volumes:
+      - /media_data/library:/config
+      - /media_data/shows:/tv
+      - /media_data/movies:/movies
