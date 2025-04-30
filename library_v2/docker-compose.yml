@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Медиасервер для просмотра
   photoprism:
@@ -74,3 +72,22 @@ services:
       MARIADB_USER: "photoprism"
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD} 
+
+# Torrserver для торентов
+  torrserver:
+    image: ghcr.io/yourok/torrserver:latest
+    container_name: torrserver
+    restart: unless-stopped
+    ports:
+      - "8090:8090"  # Веб-интерфейс и API
+    volumes:
+      - /home/librarian/torrserver/config:/opt/torrserver/config
+      - /home/librarian/torrserver/log:/opt/torrserver/log
+      - /media_data/torrent:/opt/torrserver/torrents
+    environment:
+      - TZ=Europe/Moscow  # Часовой пояс
+      - TS_DONTKILL=true
+      - TS_SEARCHWA=true
+      - TS_TORR_DIR=/opt/torrserver/torrents
+      - TS_PATH=/opt/torrserver/config
+      - TS_LOGPATHDIR=/opt/torrserver/log
