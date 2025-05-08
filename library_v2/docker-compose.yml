@@ -85,7 +85,7 @@ services:
       - WEBUI_PORT=8080
     volumes:
       - /home/librarian/qbittorrent/config:/config         # конфиги
-      - /media_data/torrent:/downloads    # папка загрузок
+      - /media_data:/downloads    # папка загрузок
     ports:
       - "8080:8080"               # веб-интерфейс
       - "6881:6881"               # входящие соединения (torrent)
