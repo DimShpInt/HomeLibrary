@@ -1,6 +1,6 @@
 
 services:
-  # Медиасервер для просмотра
+# Медиасервер для просмотра
   photoprism:
     image: photoprism/photoprism:latest
     restart: unless-stopped
@@ -40,7 +40,7 @@ services:
       - "/storage/storage/sidecar:/photoprism/storage/sidecar"    # HDD
       - "/storage/storage/config:/photoprism/storage/config"      # HDD
       - "/home/librarian/library/media_server/photoprism/storage/cache:/photoprism/storage/cache"                  # *Writable* storage folder for cache, database, and sidecar files (DO NOT REMOVE)
-      
+# База данных для photoprism
   mariadb:
     image: mariadb:11
     restart: unless-stopped
@@ -74,8 +74,24 @@ services:
       MARIADB_USER: "photoprism"
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD} 
-
-# Torrserver для торентов
+# qbittorrent для скачивания torrent
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=Europe/Moscow
+      - WEBUI_PORT=8080
+    volumes:
+      - /home/librarian/qbittorrent/config:/config         # конфиги
+      - /media_data/torrent:/downloads    # папка загрузок
+    ports:
+      - "8080:8080"               # веб-интерфейс
+      - "6881:6881"               # входящие соединения (torrent)
+      - "6881:6881/udp"           # UDP для DHT
+    restart: unless-stopped
+# Torrserver для онлайн просмотра
   torrserver:
     image: ghcr.io/yourok/torrserver:latest
     container_name: torrserver
@@ -93,7 +109,6 @@ services:
       - TS_TORR_DIR=/opt/torrserver/torrents
       - TS_PATH=/opt/torrserver/config
       - TS_LOGPATHDIR=/opt/torrserver/log
-
 # Plex
   plex:
     image: lscr.io/linuxserver/plex:latest
